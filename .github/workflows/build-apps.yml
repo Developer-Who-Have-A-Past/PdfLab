@@ -1,0 +1,61 @@
+name: Build Windows and Android apps
+on:
+  workflow_dispatch:        # run manually from the Actions tab
+  push:
+    tags: ["v*"]            # tag like v0.1.0 also creates a Release with the files
+permissions:
+  contents: write
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm install
+      - run: npm run build
+      - run: npx electron-builder --win --publish never
+      - uses: actions/upload-artifact@v4
+        with:
+          name: coolbase-windows
+          path: dist/*.exe
+
+  android:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+      - run: npm install
+      - run: npm run build
+      - run: npx cap add android
+      - name: Generate launcher icons (only if assets/icon-only.png exists)
+        run: |
+          if [ -f assets/icon-only.png ]; then npx @capacitor/assets generate --android || true; fi
+      - run: npx cap sync android
+      - name: Build debug APK
+        run: cd android && chmod +x gradlew && ./gradlew assembleDebug
+      - uses: actions/upload-artifact@v4
+        with:
+          name: coolbase-android
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [windows, android]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: files
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            files/coolbase-windows/*.exe
+            files/coolbase-android/*.apk
