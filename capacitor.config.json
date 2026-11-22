@@ -1,0 +1,6 @@
+{
+  "appId": "com.coolbase.app",
+  "appName": "coolBase",
+  "webDir": "out",
+  "server": { "androidScheme": "https" }
+}

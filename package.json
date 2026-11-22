@@ -1,0 +1,44 @@
+{
+  "name": "coolbase",
+  "version": "0.1.0",
+  "private": true,
+  "main": "electron/main.js",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "android:sync": "npm run build && npx cap sync android",
+    "android:open": "npx cap open android",
+    "win:dev": "npm run build && electron .",
+    "win:build": "npm run build && electron-builder --win",
+    "icons": "npx @capacitor/assets generate --android"
+  },
+  "dependencies": {
+    "@pdfsmaller/pdf-encrypt": "^1.0.2",
+    "jszip": "^3.10.1",
+    "next": "^15.0.0",
+    "pdf-lib": "^1.17.1",
+    "pdfjs-dist": "^4.8.69",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@capacitor/android": "^6.1.0",
+    "@capacitor/cli": "^6.1.0",
+    "@capacitor/core": "^6.1.0",
+    "electron": "^33.0.0",
+    "electron-builder": "^25.1.8"
+  },
+  "build": {
+    "appId": "com.coolbase.app",
+    "productName": "coolBase",
+    "files": [
+      "electron/**",
+      "out/**"
+    ],
+    "win": {
+      "target": "nsis"
+    }
+  },
+  "description": "coolBase - PDF tools that run on your device",
+  "author": "coolBase"
+}
